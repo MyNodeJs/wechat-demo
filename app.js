@@ -5,7 +5,7 @@ var config = require("./config");
 var errorhandler = require("errorhandler");
 var bodyParser = require("body-parser");
 var os = require("os");
-
+var tool = require("./tool");
 
 var path = require("path");
 
@@ -51,14 +51,7 @@ app.use('/', wechat(config.wechat, function (req, res, next) {
                 }
             });
         } else if (/系统/.test(content)) {
-            var attr = {
-                type: os.type(),
-                platform: os.platform(),
-                arch: os.arch(),
-                release: os.release(),
-                hostname: os.hostname(),
-                tmp: os.tmpdir()
-            };
+            var attr = tool.getOsInfo();
             var content = 'type:' + attr.type + '\r\n' + 'platform:' + attr.platform + '\r\n' + 'arch:' + attr.arch + '\r\n'
                             + 'release:' + attr.release + '\r\n' + 'hostname:' + attr.hostname;
 
@@ -67,11 +60,16 @@ app.use('/', wechat(config.wechat, function (req, res, next) {
                 type: 'text'
             });
 
-        } else if (/内存/) {
-            var total = os.totalmem(), free = os.freemem(), remainPercent = (free / total)*100 , usePercent = ((total-free)/total)*100;
-            var content = '总内存:' + total + '\r\n' + '剩余内存:' + free;
+        } else if (/内存/.test(content)) {
+            var attr = tool.getMemInfo();
+            var content = '总内存:' + attr.total + '\r\n' + '剩余内存:' + attr.free + '\r\n' + '使用率:' + attr.usePercent;
             res.reply({
                 content: content,
+                type: 'text'
+            });
+        } else {
+            res.reply({
+                content: '收到,收到, 但我不知道',
                 type: 'text'
             });
         }
