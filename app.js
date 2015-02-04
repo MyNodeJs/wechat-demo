@@ -17,36 +17,39 @@ app.use(logger('combined'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.use('/wechat', wechat(config.wechat, function (req, res, next) {
+console.log("config.wechat\n", config.wechat);
+app.use('/', wechat(config.wechat, function (req, res, next) {
     // 微信输入信息都在req.weixin上
     var message = req.weixin;
-    if (message.FromUserName === 'text') {
-        res.reply('hehe');
-    } else if (message.FromUserName === 'text') {
+    console.log("message\n", message);
+    var content = message.Content;
+    if (content === '约吗') {
         res.reply({
-            content: 'text object',
+            content: '约你妹呀！',
             type: 'text'
         });
-    } else if (message.FromUserName === 'hehe') {
+    }
+    if (content === '求图片') {
+        res.reply([
+            {
+                title: '菇凉我的靓照!',
+                description: '女神嫁到',
+                picurl: 'http://picview01.baomihua.com/photos/20120119/m_14_634626046352187500_36036466.jpg',
+                url: 'http://weibo.com/fengjieluoyufeng?c=spr_qdhz_bd_baidusmt_weibo_s&nick=%E7%BD%97%E7%8E%89%E5%87%A4'
+            }
+        ]);
+    }
+    if (content === '音乐') {
         res.reply({
             type: 'music',
             content: {
                 title: '来段音乐吧',
-                description: '一无所有',
+                description: '好听的轻音乐',
                 musicUrl: 'http://114.215.159.50:7000/%E7%BA%AF%E9%9F%B3%E4%B9%90%20-%20%E6%82%A0%E4%B9%85%E3%81%AE%E6%99%82.mp3',
                 hqMusicUrl: 'http://114.215.159.50:7000/%E7%BA%AF%E9%9F%B3%E4%B9%90%20-%20%E6%82%A0%E4%B9%85%E3%81%AE%E6%99%82.mp3',
                 thumbMediaId: 'thisThumbMediaId'
             }
         });
-    } else {
-        res.reply([
-            {
-                title: '你来我家接我吧',
-                description: '这是女神与高复帅的对话',
-                picurl: 'https://avatars1.githubusercontent.com/u/6081537?v=3&u=3fddd9be8bf877151191a69f841d80fc3466b2a2&s=140',
-                url: 'https//www.github.com'
-            }
-        ]);
     }
 }));
 app.get('/', function (req, res) {
