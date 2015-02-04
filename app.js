@@ -62,7 +62,7 @@ app.use('/', wechat(config.wechat, function (req, res, next) {
 
         } else if (/内存/.test(content)) {
             var attr = tool.getMemInfo();
-            var content = '总内存:' + attr.total + '\r\n' + '剩余内存:' + attr.free + '\r\n' + '使用率:' + attr.usePercent;
+            var content = '总内存:' + attr.total + '\r\n' + '剩余内存:' + attr.free + '\r\n' + '使用率:' + attr.usePercent + '%';
             res.reply({
                 content: content,
                 type: 'text'
