@@ -4,21 +4,20 @@ var logger = require("morgan");
 var config = require("./config");
 var errorhandler = require("errorhandler");
 var bodyParser = require("body-parser");
-var os = require("os");
-var tool = require("./tool");
-
+var fs = require("fs");
 var path = require("path");
+var os = require("os");
 
+var tool = require("./tool");
+var accessLogFilePath = __dirname + '/access.log';
+var errorLogFilePath = __dirname + '/error.log';
+var accessLogStream = fs.createWriteStream(accessLogFilePath, {flags: 'a'});
+var errorLogStream = fs.createWriteStream(errorLogFilePath, {flags: 'a'});
 var app = express();
 
 //config
 app.set('port', process.env.PORT || 3000);
-
-app.use(logger('combined'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-
-app.use('/', wechat(config.wechat, function (req, res, next) {
+app.use('/api/', wechat(config.wechat, function (req, res, next) {
     // 微信输入信息都在req.weixin上
     var message = req.weixin;
     console.log("message\n", message);
@@ -53,7 +52,7 @@ app.use('/', wechat(config.wechat, function (req, res, next) {
         } else if (/系统/.test(content)) {
             var attr = tool.getOsInfo();
             var content = 'type:' + attr.type + '\r\n' + 'platform:' + attr.platform + '\r\n' + 'arch:' + attr.arch + '\r\n'
-                            + 'release:' + attr.release + '\r\n' + 'hostname:' + attr.hostname;
+              + 'release:' + attr.release + '\r\n' + 'hostname:' + attr.hostname;
 
             res.reply({
                 content: content,
@@ -82,7 +81,12 @@ app.use('/', wechat(config.wechat, function (req, res, next) {
         });
     }
 }));
-app.get('/', function (req, res) {
+
+app.use(logger('combined', {stream: accessLogStream}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.get('/api/', function (req, res) {
     console.log('wechat connect come');
     console.log("req.query\n", req.query);
     res.send(req.query.echostr);
@@ -91,6 +95,8 @@ app.post('/', function (req, res) {
     console.log("req.body\n", req.body);
     res.send('');
 });
+
+
 app.use(errorhandler());
 app.listen(app.get('port'), function () {
     console.log('Server listening on:', app.get('port'));
