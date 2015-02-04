@@ -46,7 +46,11 @@ app.use('/wechat', wechat(config.wechat, function (req, res, next) {
         ]);
     }
 }));
-
+app.get('/', function (req, res) {
+    console.log('wechat connect come');
+    console.log("req.query\n", req.query);
+    res.send(req.query.echostr);
+});
 app.use(errorhandler());
 app.listen(app.get('port'), function () {
     console.log('Server listening on:', app.get('port'));
