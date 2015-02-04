@@ -3,6 +3,7 @@ var express = require("express");
 var logger = require("morgan");
 var config = require("./config");
 var errorhandler = require("errorhandler");
+var bodyParser = require("body-parser");
 
 
 var path = require("path");
@@ -13,6 +14,8 @@ var app = express();
 app.set('port', process.env.PORT || 3000);
 
 app.use(logger('combined'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.use('/wechat', wechat(config.wechat, function (req, res, next) {
     // 微信输入信息都在req.weixin上
@@ -50,6 +53,10 @@ app.get('/', function (req, res) {
     console.log('wechat connect come');
     console.log("req.query\n", req.query);
     res.send(req.query.echostr);
+});
+app.post('/', function (req, res) {
+    console.log("req.body\n", req.body);
+    res.send('');
 });
 app.use(errorhandler());
 app.listen(app.get('port'), function () {
