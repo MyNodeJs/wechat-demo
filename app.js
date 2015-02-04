@@ -16,7 +16,10 @@ var errorLogStream = fs.createWriteStream(errorLogFilePath, {flags: 'a'});
 var app = express();
 
 //config
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 80);
+app.use(logger('combined', {stream: accessLogStream}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 app.use('/api/', wechat(config.wechat, function (req, res, next) {
     // 微信输入信息都在req.weixin上
     var message = req.weixin;
@@ -82,9 +85,7 @@ app.use('/api/', wechat(config.wechat, function (req, res, next) {
     }
 }));
 
-app.use(logger('combined', {stream: accessLogStream}));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+
 
 app.get('/api/', function (req, res) {
     console.log('wechat connect come');
