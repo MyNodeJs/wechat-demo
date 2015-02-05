@@ -2,4 +2,5 @@
 access.log
 error.log
 config.js
+.tmp
 node_modules
